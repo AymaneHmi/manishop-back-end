@@ -59,13 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
-        // Fetch the blog
         $subcategory = mysqli_fetch_assoc($result);
-        // $category_id = $subcategory['category_id'];
-
-        // $categoryQuery = "SELECT * FROM categories WHERE category_id='$category_id'";
-        // $categoryResult = mysqli_query($conn, $categoryQuery);
-        // $category = mysqli_fetch_assoc($categoryResult);
 
         $response = array(
             'id' => $id,
@@ -75,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         );
         
     } else {
-        // User with the provided email does not exist, set the variable to false
         $response = array("error" => "category not found");
         echo json_encode($response);
         exit;
@@ -148,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
             echo json_encode(array('error' => 'there is product with this subcategory.'));
             exit;
         }
-        // Delete the subcategory from the database
+
         $delete = "DELETE FROM subcategories WHERE subcategory_id = ?";
         $stmt = mysqli_prepare($conn, $delete);
         mysqli_stmt_bind_param($stmt, "s", $id);

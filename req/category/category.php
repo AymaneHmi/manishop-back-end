@@ -36,12 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 
     $category_id = $conn->insert_id;
-    // Extract image data from the Base64 string
     list($type, $data) = explode(';', $image);
     list(, $data) = explode(',', $data);
     $data = base64_decode($data);
 
-    // Determine the image extension based on the image type
     $image_extension = '';
     if (strpos($type, 'image/png') !== false) {
         $image_extension = 'png';
@@ -49,14 +47,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $image_extension = 'jpg';
     } elseif (strpos($type, 'image/gif') !== false) {
         $image_extension = 'gif';
-    } else {
-        // Handle other image types if needed
     }
 
-    // Generate a unique filename for each image
     $filename = uniqid() . '.' . $image_extension;
 
-    // Save the image to a directory on the server
     $uploadDirectory = '../../imgs/categories/' . $filename;
 
     if(!file_put_contents($uploadDirectory, $data)) {
@@ -91,11 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
-        // Fetch the blog
         $category = mysqli_fetch_assoc($result);
     
-        // get the images to delete from the folder
-
         $response = array(
             'id' => $id,
             'name' => $category['name'],
@@ -104,7 +95,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         );
         
     } else {
-        // User with the provided email does not exist, set the variable to false
         $response = array("error" => "category not found");
         echo json_encode($response);
         exit;
@@ -170,7 +160,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
         list(, $data) = explode(',', $data);
         $data = base64_decode($data);
 
-        // Determine the image extension based on the image type
         $image_extension = '';
         if (strpos($type, 'image/png') !== false) {
             $image_extension = 'png';
@@ -178,14 +167,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
             $image_extension = 'jpg';
         } elseif (strpos($type, 'image/gif') !== false) {
             $image_extension = 'gif';
-        } else {
-            // Handle other image types if needed
         }
 
-        // Generate a unique filename for each image
         $filename = uniqid() . '.' . $image_extension;
 
-        // Save the image to a directory on the server
         $uploadDirectory = '../../imgs/categories/' . $filename;
 
         if(!file_put_contents($uploadDirectory, $data)) {
@@ -221,13 +206,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 0) {
-        // User with the provided email does not exist, set the variable to false
         $response = array("error" => "category not found");
         echo json_encode($response);
         exit;
     }
     
-    // Fetch the blog
     $category = mysqli_fetch_assoc($result);
 
     $sql = "SELECT * FROM subcategories WHERE category_id = '$id'";
@@ -246,12 +229,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
             echo json_encode($response);
             exit;
         }
-        // Delete the blog from the database
         $delete = "DELETE FROM categories WHERE category_id = ?";
         $stmt = mysqli_prepare($conn, $delete);
         mysqli_stmt_bind_param($stmt, "s", $id);
         if (!mysqli_stmt_execute($stmt)) {
-            // Error
             $response = array("error" => "category not deleted");
             echo json_encode($response);
             exit;

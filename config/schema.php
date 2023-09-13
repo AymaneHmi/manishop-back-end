@@ -121,16 +121,12 @@ $sql = "
     );
 
 ";
-// ALTER TABLE users ADD email_verify TINYINT(1) DEFAULT 0;
 
-// Split the SQL statements into an array
 $sqlStatements = explode(';', $sql);
 
 foreach ($sqlStatements as $sqlStatement) {
-    // Trim the statement to remove any leading or trailing white spaces
     $sqlStatement = trim($sqlStatement);
 
-    // Execute each individual SQL statement
     if (!empty($sqlStatement)) {
         if ($conn->query($sqlStatement) !== TRUE) {
             echo json_encode(array('error' => 'db error'));

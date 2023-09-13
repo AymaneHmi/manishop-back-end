@@ -12,13 +12,12 @@ if (isset($postdata) && !empty($postdata)) {
     $result = mysqli_query($conn, $sql);
 
     if (!$result) {
-        http_response_code(500); // Internal Server Error
+        http_response_code(500);
         echo json_encode(array('error' => 'Failed to query database'));
         exit;
     }
 
     if (mysqli_num_rows($result) == 1) {
-        // Fetch the user data
         $admin_user = mysqli_fetch_assoc($result);
     
         $response = array(

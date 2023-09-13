@@ -2,7 +2,6 @@
 
 $envFilePath = __DIR__ . '/../.env';
 
-// Check if the .env file exists
 if (file_exists($envFilePath)) {
     $lines = file($envFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 

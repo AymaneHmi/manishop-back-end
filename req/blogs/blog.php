@@ -42,12 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 
     $blog_id = $conn->insert_id;
-    // Extract image postdata from the Base64 string
     list($type, $postdata) = explode(';', $image);
     list(, $postdata) = explode(',', $postdata);
     $postdata = base64_decode($postdata);
 
-    // Determine the image extension based on the image type
     $image_extension = '';
     if (strpos($type, 'image/png') !== false) {
         $image_extension = 'png';
@@ -55,14 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $image_extension = 'jpg';
     } elseif (strpos($type, 'image/gif') !== false) {
         $image_extension = 'gif';
-    } else {
-        // Handle other image types if needed
     }
 
-    // Generate a unique filename for each image
     $filename = uniqid() . '.' . $image_extension;
 
-    // Save the image to a directory on the server
     $uploadDirectory = '../imgs/blogs/' . $filename;
 
     if(!file_put_contents($uploadDirectory, $postdata)) {
@@ -88,6 +82,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
 
+    $id = filter_var($postdata['id'], FILTER_SANITIZE_STRING);
+    $title = filter_var($postdata['title'], FILTER_SANITIZE_STRING);
+    $description = filterHtmlTags($postdata['description']);
+    $tags = $postdata['tags'];
+    $image = $postdata['upload_image'];
+    $delete_image = $postdata['delete_image'];
+
+    if(empty($title) || empty($description) || empty($id) || empty($tags)){
+        $response = array( 'error'  => 'Data is requiered!');
+        echo json_encode($response);
+        exit;
+    }
+
+    if((empty($delete_image) && $image) || ($delete_image && empty($image))){
+        $response = array( 'error'  => 'you have to replace image!');
+        echo json_encode($response);
+        exit;
+    }
+
+    if(!$conn) {
+        $response = array( 'error'  => 'could not connect to database!');
+        echo json_encode($response);
+        exit;
+    }
+
+    $tags_json = json_encode($tags);
+
+    $query = "UPDATE blogs SET title=?, description=?, tags=? WHERE blog_id=?";
+    $stmt = $conn->prepare($query);
+
+    $stmt->bind_param("sssi", $title, $description, $tags_json, $id);
+
+    if (!$stmt->execute()) {
+        $response = array( 'error' => 'Could not update data in the database!');
+        echo json_encode($response);
+        exit;
+    }
+
+    $stmt->close();
+
+    
+    if(!empty($image) && !empty($delete_image)){
+        $image_path = '../../imgs/blogs/' . $delete_image;
+        if (file_exists($image_path)) {
+            if(!unlink($image_path)){
+                $response = array('error' => 'Could not delete image');
+                echo json_encode($response);
+                exit;
+            }
+        } else {
+            $response = array('error' => "image(s) couldn't found.");
+            echo json_encode($response);
+            exit;
+        }
+
+        list($type, $data) = explode(';', $image);
+        list(, $data) = explode(',', $data);
+        $data = base64_decode($data);
+
+        $image_extension = '';
+        if (strpos($type, 'image/png') !== false) {
+            $image_extension = 'png';
+        } elseif (strpos($type, 'image/jpeg') !== false) {
+            $image_extension = 'jpg';
+        } elseif (strpos($type, 'image/gif') !== false) {
+            $image_extension = 'gif';
+        }
+
+        $filename = uniqid() . '.' . $image_extension;
+
+        $uploadDirectory = '../../imgs/blogs/' . $filename;
+
+        if(!file_put_contents($uploadDirectory, $data)) {
+            $response = array( 'error' => 'Failed to upload image');
+            echo json_encode($response);
+            exit;
+        }
+
+        $sql = "UPDATE blogs SET image='$filename' WHERE blog_id='$id'";
+
+        if(!$conn->query($sql)) {
+            $response = array( 'error' => 'Failed to update image row in database');
+            echo json_encode($response);
+            exit;
+        }
+    }
+
+    $response = array( 'success' => 'Blog updated successfuly.');
+
+    echo json_encode($response);
 }
 
 // -----------------------------
@@ -106,23 +190,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
-        // Fetch the blog
         $blog = mysqli_fetch_assoc($result);
 
         $filename = $blog['image'];
-        $filepath = '../imgs/blogs/' . $filename;
+        $filepath = '../../imgs/blogs/' . $filename;
         if (file_exists($filepath)) {
             if (!unlink($filepath)) {
                 $response = array("error" => "probleme accured when deleting this image");
                 echo json_encode($response);
                 exit;
             }
-            // Delete the blog from the postdatabase
             $delete = "DELETE FROM blogs WHERE blog_id = ?";
             $stmt = mysqli_prepare($conn, $delete);
             mysqli_stmt_bind_param($stmt, "s", $id);
             if (!mysqli_stmt_execute($stmt)) {
-                // Error
                 $response = array("error" => "blog not deleted");
                 echo json_encode($response);
                 exit;
@@ -136,7 +217,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
         
     } else {
-        // User with the provided email does not exist, set the variable to false
         $response = array("error" => "blog not found");
         echo json_encode($response);
         exit;
@@ -162,7 +242,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
-        // Fetch the blog
         $blog = mysqli_fetch_assoc($result);
         
         $user_id = $blog['user_id'];
@@ -170,7 +249,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $user_result = mysqli_query($conn, $user_sql);
     
         if (!$user_result) {
-            http_response_code(500); // Internal Server Error
+            http_response_code(500);
             echo json_encode(array('error' => 'Failed to query database'));
             exit;
         }
@@ -187,7 +266,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             'createdAt' => $blog['created_at'],
         );
     } else {
-        // User with the provided email does not exist, set the variable to false
         $response = array("error" => "blog not found");
         echo json_encode($response);
         exit;

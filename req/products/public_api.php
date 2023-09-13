@@ -20,7 +20,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 $subcategoryQuery = "SELECT * FROM subcategories WHERE subcategory_id='$subcategory_id'";
                 $subcategoryResult = mysqli_query($conn, $subcategoryQuery);
                 $subcategory = mysqli_fetch_assoc($subcategoryResult);
-                // Build response array
+
                 $post = array(
                     'id' => $product['product_id'],
                     'subcategory' => $subcategory['name'],
@@ -43,7 +43,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             exit;
         }
     } else {
-        // Unauthorized
         header('HTTP/1.1 401 Unauthorized');
         echo 'Unauthorized';
     }

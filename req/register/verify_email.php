@@ -28,7 +28,6 @@ if (isset($postdata) && !empty($postdata)) {
     $stmt = mysqli_prepare($conn, $delete);
     mysqli_stmt_bind_param($stmt, "s", $code);
     if (!mysqli_stmt_execute($stmt)) {
-        // Error
         $response = array("error" => "code is not deleted");
         echo json_encode($response);
         exit;

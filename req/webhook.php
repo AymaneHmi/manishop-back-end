@@ -20,11 +20,9 @@ try {
     $payload, $sig_header, $endpoint_secret
   );
 } catch(\UnexpectedValueException $e) {
-  // Invalid payload
   http_response_code(400);
   exit();
 } catch(\Stripe\Exception\SignatureVerificationException $e) {
-  // Invalid signature
   http_response_code(400);
   exit();
 }

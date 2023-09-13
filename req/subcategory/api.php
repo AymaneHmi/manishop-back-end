@@ -36,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(array('error' => 'No subcategories found.'));
         }
     } else {
-        // Unauthorized
         header('HTTP/1.1 401 Unauthorized');
         echo 'Unauthorized';
     }

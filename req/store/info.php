@@ -13,16 +13,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
-        // Fetch the result
         $row = $result->fetch_assoc();
         
-        // Get the total number of orders
         $totalOrders = $row['total_orders'];
         
-        // Get the total price of paid orders
         $totalPrice = $row['total_price'];
         
-        // Get the total number of products_ids elements
         $totalProducts = $row['total_products'];
         
         $response = array(

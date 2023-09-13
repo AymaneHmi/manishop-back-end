@@ -18,7 +18,6 @@ if (isset($postdata) && !empty($postdata)) {
 
     if (mysqli_num_rows($result) > 0) {
         while ($order = mysqli_fetch_assoc($result)) {
-            // Build response array
             $post = array(
                 'id' => $order['id'],
                 'orderId' => $order['order_id'],

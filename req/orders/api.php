@@ -11,7 +11,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         if (mysqli_num_rows($result) > 0) {
             $response = array();
             while ($order = mysqli_fetch_assoc($result)) {
-                // Build response array
                 $post = array(
                     'id' => $order['id'],
                     'orderId' => $order['order_id'],
@@ -29,12 +28,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             header('Content-Type: application/json');
             echo json_encode($response);
         } else {
+            http_response_code(500);
             echo json_encode(array( 'error' => 'No order found.'));
             exit;
         }
     } else {
-        // Unauthorized
-        header('HTTP/1.1 401 Unauthorized');
-        echo 'Unauthorized';
+        http_response_code(401);
+        json_encode(array('error' => 'Unauthorized'));
+        exit;
     }
 }

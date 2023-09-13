@@ -16,7 +16,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 $user_result = mysqli_query($conn, $user_sql);
             
                 if (!$user_result) {
-                    http_response_code(500); // Internal Server Error
+                    http_response_code(500);
                     echo json_encode(array('error' => 'Failed to query database'));
                     exit;
                 }
@@ -34,14 +34,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 );
                 array_push($response, $post);
             }
-            // header('Content-Type: application/json');
             echo json_encode($response);
         } else {
             echo json_encode(array('error' => 'No blog found.'));
             exit;
         }
     } else {
-        // Unauthorized
         header('HTTP/1.1 401 Unauthorized');
         echo 'Unauthorized';
     }

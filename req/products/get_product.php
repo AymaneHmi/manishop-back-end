@@ -18,7 +18,6 @@ if (isset($postdata) && !empty($postdata)) {
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
-        // Fetch the product
         $product = mysqli_fetch_assoc($result);
 
         $product_id = $product['product_id'];
@@ -62,7 +61,7 @@ if (isset($postdata) && !empty($postdata)) {
                 $subcategoryQuery = "SELECT * FROM subcategories WHERE subcategory_id='$subcategory_id'";
                 $subcategoryResult = mysqli_query($conn, $subcategoryQuery);
                 $subcategory = mysqli_fetch_assoc($subcategoryResult);
-                // Build response array
+
                 $post = array(
                     'id' => $product['product_id'],
                     'subcategory' => $subcategory['name'],

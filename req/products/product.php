@@ -47,12 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $product_id = $conn->insert_id;
     foreach ($images as $base64_image) {
-        // Extract image data from the Base64 string
+
         list($type, $data) = explode(';', $base64_image);
         list(, $data) = explode(',', $data);
         $data = base64_decode($data);
     
-        // Determine the image extension based on the image type
         $image_extension = '';
         if (strpos($type, 'image/png') !== false) {
             $image_extension = 'png';
@@ -60,14 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $image_extension = 'jpg';
         } elseif (strpos($type, 'image/gif') !== false) {
             $image_extension = 'gif';
-        } else {
-            // Handle other image types if needed
         }
     
-        // Generate a unique filename for each image
         $filename = uniqid() . '.' . $image_extension;
     
-        // Save the image to a directory on the server
         $uploadDirectory = '../../imgs/products/' . $filename;
     
         if(!file_put_contents($uploadDirectory, $data)) {
@@ -106,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
-        // Fetch the product
+
         $product = mysqli_fetch_assoc($result);
 
         $response = array(
@@ -158,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
-        // Fetch the product
+
         $product = mysqli_fetch_assoc($result);
 
         $images = json_decode($product['images'], true);
@@ -179,12 +174,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
     
         if(!empty($upload_images)){
             foreach($upload_images as $image) {
-                // Extract image data from the Base64 string
+
                 list($type, $data) = explode(';', $image);
                 list(, $data) = explode(',', $data);
                 $data = base64_decode($data);
                 
-                // Determine the image extension based on the image type
                 $image_extension = '';
                 if (strpos($type, 'image/png') !== false) {
                     $image_extension = 'png';
@@ -192,15 +186,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
                     $image_extension = 'jpg';
                 } elseif (strpos($type, 'image/gif') !== false) {
                     $image_extension = 'gif';
-                } else {
-                    // Handle other image types if needed
-                    continue; // Skip this image if its type is not supported
                 }
                 
-                // Generate a unique filename for each image
                 $filename = uniqid() . '.' . $image_extension;
                 
-                // Save the image to a directory on the server
                 $uploadDirectory = '../../imgs/products/' . $filename;
 
                 if(!file_put_contents($uploadDirectory, $data)) {
@@ -209,7 +198,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
                     exit;
                 }
                 
-                // Insert the image filename and project ID into the $imgs array
                 $images[] = $filename;
             }
 
@@ -285,7 +273,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
-        // Fetch the product
         $product = mysqli_fetch_assoc($result);
 
         $images = json_decode($product['images'], true);
@@ -305,12 +292,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
                 exit;
             }
         }
-        // Delete the product from the database
+
         $delete = "DELETE FROM products WHERE product_id = ?";
         $stmt = mysqli_prepare($conn, $delete);
         mysqli_stmt_bind_param($stmt, "s", $id);
         if (!mysqli_stmt_execute($stmt)) {
-            // Error
             $response = array("error" => "product not deleted");
             echo json_encode($response);
             exit;
@@ -319,7 +305,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         $stmt_cart = mysqli_prepare($conn, $delete_cart);
         mysqli_stmt_bind_param($stmt, "s", $id);
         if (!mysqli_stmt_execute($stmt)) {
-            // Error
             $response = array("error" => "carts not deleted");
             echo json_encode($response);
             exit;
@@ -328,7 +313,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         $stmt_favorite = mysqli_prepare($conn, $delete_favorite);
         mysqli_stmt_bind_param($stmt, "s", $id);
         if (!mysqli_stmt_execute($stmt)) {
-            // Error
             $response = array("error" => "favorites not deleted");
             echo json_encode($response);
             exit;

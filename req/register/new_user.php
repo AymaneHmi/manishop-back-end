@@ -81,7 +81,6 @@ if (isset($postdata) && !empty($postdata)) {
         list(, $data) = explode(',', $data);
         $data = base64_decode($data);
 
-        // Determine the image extension based on the image type
         $image_extension = '';
         if (strpos($type, 'image/png') !== false) {
             $image_extension = 'png';
@@ -89,14 +88,10 @@ if (isset($postdata) && !empty($postdata)) {
             $image_extension = 'jpg';
         } elseif (strpos($type, 'image/gif') !== false) {
             $image_extension = 'gif';
-        } else {
-            // Handle other image types if needed
         }
 
-        // Generate a unique filename for each image
         $filename = uniqid() . '.' . $image_extension;
 
-        // Save the image to a directory on the server
         $uploadDirectory = '../../imgs/users/' . $filename;
 
         if(!file_put_contents($uploadDirectory, $data)) {

@@ -183,7 +183,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $stmt = mysqli_prepare($conn, $delete);
     mysqli_stmt_bind_param($stmt, "i", $cart_id);
     if (!mysqli_stmt_execute($stmt)) {
-        // Error
         $response = array("error" => "cart not removed.");
         echo json_encode($response);
         exit;
